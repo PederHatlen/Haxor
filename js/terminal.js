@@ -27,21 +27,42 @@ class terminal{
         return this.newLine();
     }
     command(){
-        let command = this.el.lastChild.innerHTML.split("</span>")[1].toLowerCase().trim();
-        switch (command.split(" ")[0]) {
+        let command = this.el.lastChild.innerHTML.split("</span>")[1].toLowerCase().trim().split(" ");
+        switch (command[0]) {
             case "clear":
                 this.el.textContent = '';
                 break;
-            case "spitt": 
+            case "codedump": 
                 this.dumpText(dataDump.split("\n"), command.includes("--cont"));
                 break;
             case "fullscreen":
                 document.body.requestFullscreen();
                 this.newLine("Press esc to quit fullscreen", false);
                 break;
+            case "recolor":
+                let out = "";
+                if(command[1] != undefined && Object.keys(colorInstances).includes(command[1])){
+                    if(command[2] != undefined && !isNaN(command[2])){
+                        colorInstances[command[1]].recolor(randomColors(Number(command[2])))
+                    }else{this.newLine(`Did not find a way to use '${command[2]}' as a number`, false);}
+                }else{
+                    this.newLine(`Did not find '${command[1]}', available objects are: `, false);
+                    this.dumpText(Object.keys(colorInstances));
+                }
+                break;
+            case "help":
+                this.dumpText([
+                    "Current supported commands:",
+                    "  help       - You are currently looking at it",
+                    "  clear      - Clears the terminal",
+                    "  codedump   - Dump some code into the terminal, can be made continuous with --cont",
+                    "  fullscreen - Putt the page in fullscreen",
+                    "  recolor    - Re color an instance: recolor [object] [color amount] (randomly selected)"
+                ]);
+                break;
             default:
                 this.newLine();
-                this.el.lastChild.innerHTML = `-bash: ${command}: command not found`;
+                this.el.lastChild.innerHTML = `-bash: ${command.split(" ")[0]}: command not found`;
         }
         if(!this.dumping) this.newLine();
     }

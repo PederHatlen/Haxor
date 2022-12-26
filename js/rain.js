@@ -5,6 +5,7 @@ class rain{
 	
 		for(let i = 0; i < that.drops.length; i++){
 			const drop = that.drops[i];
+			// console.log(that.colors)
 			that.ctx.fillStyle = that.colors[~~(Math.random()*that.colors.length)];
 			that.ctx.fillText(drop[1], i*that.size, drop[0]*that.size);
 	
@@ -34,6 +35,7 @@ class rain{
 
 		this.ctx.font = this.size+"px "+ this.font;
 	}
+	recolor(colors){this.colors = colors;}
     constructor(el, chars, alpha, colors, font, size, timeout){
 		this.el = el;
 		this.chars = chars;

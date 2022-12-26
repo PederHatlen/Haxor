@@ -65,6 +65,11 @@ class pipeRenderer{
 
         this.WH = [~~(this.el.width/this.size), ~~(this.el.height/this.size)];
     }
+    reColor(palette){
+        for(const i in this.pipes){
+            this.pipes[i].color = this.palette[~~(Math.random()*this.palette.length)];
+        }
+    }
     constructor(el, count, size, pipeWidth, maxLen=100, minLen=1, palette=["#fff", "#f00", "#0f0", "#00f"], timeout=40){
         this.el = el;
         this.size = size;
