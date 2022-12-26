@@ -26,8 +26,8 @@ class terminal{
         this.dumping = false;
         return this.newLine();
     }
-    command(){
-        let command = this.el.lastChild.innerHTML.split("</span>")[1].toLowerCase().trim().split(" ");
+    command(data){
+        let command = data.toLowerCase().trim().split(" ")
         switch (command[0]) {
             case "clear":
                 this.el.textContent = '';

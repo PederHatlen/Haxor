@@ -29,3 +29,8 @@ let colorInstances = {
 	// "terminal1":terminal1,
 	// "terminal2":terminal2
 };
+
+if(navigator.userAgent.includes("Mobile")){
+	terminal1.command("codedump --cont");
+	terminal2.command("tree --cont");
+}
