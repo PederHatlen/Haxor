@@ -1,53 +1,46 @@
-let matrixEl = document.getElementById("matrix");
-let rainEl = document.getElementById("rain");
-
-let matrixChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ123456789#$%^&*()*&^%+-/~{[|`]}".split("");
-let rainChars = "::;'|||    ".split("");
-
-function randomCharacter(chars){return chars[Math.floor(Math.random()*chars.length)];}
-
-function renderRain(subject){
-	subject.ctx.fillStyle = "rgba(0, 0, 0, "+(subject.alpha/100)+")";
-	subject.ctx.fillRect(0, 0, subject.el.width, subject.el.height);	
-
-	for(let i = 0; i < subject.drops.length; i++){
-		const drop = subject.drops[i];
-		subject.ctx.fillStyle = subject.color;
-		subject.ctx.fillText(drop[1], i*subject.size, drop[0]*subject.size);
-
-		var text = randomCharacter(subject.chars);
-		drop[0]++;
-		drop[1] = text;
-
-		subject.ctx.fillStyle = subject.fColor;
-		subject.ctx.fillText(text, i*subject.size, drop[0]*subject.size);
-
-		//sending the drop back to the top randomly after it has crossed the screen
-		if(drop[0]*subject.size > subject.el.height && Math.random() > 0.96){drop[0] = 0;}
-	}
-	setTimeout(renderRain, subject.speed, subject);
-	return true;
-}
-
 class rain{
+	renderRain(that=this){
+		that.ctx.fillStyle = "rgba(0, 0, 0, "+(that.alpha/100)+")";
+		that.ctx.fillRect(0, 0, that.el.width, that.el.height);	
+	
+		for(let i = 0; i < that.drops.length; i++){
+			const drop = that.drops[i];
+			that.ctx.fillStyle = that.colors[~~(Math.random()*that.colors.length)];
+			that.ctx.fillText(drop[1], i*that.size, drop[0]*that.size);
+	
+			var text = that.chars[~~(Math.random()*that.chars.length)];
+			drop[0]++;
+			drop[1] = text;
+	
+			if(that.fColor !== "undefined"){
+				that.ctx.fillStyle = that.fColor;
+				that.ctx.fillText(text, i*that.size, drop[0]*that.size);
+			}
+	
+			//sending the drop back to the top randomly after it has crossed the screen
+			if(drop[0]*that.size > that.el.height && Math.random() > 0.96){drop[0] = 0;}
+		}
+		setTimeout(that.renderRain, that.timeout, that);
+		return true;
+	}
 	setup(){
 		this.el.width = this.el.offsetWidth;
 		this.el.height = this.el.offsetHeight;
 	
 		this.drops = [];
-		for (let i = 0; i < Math.floor(this.el.width/this.charWidth); i++) {
-			this.drops.push([Math.floor(Math.random()*this.el.height)/this.size, randomCharacter(this.chars)]);
+		for (let i = 0; i < ~~(this.el.width/this.charWidth); i++) {
+			this.drops.push([~~(Math.random()*this.el.height)/this.size, this.chars[~~(Math.random()*this.chars.length)]]);
 		}
 
 		this.ctx.font = this.size+"px "+ this.font;
 	}
-    constructor(el, chars, alpha, color, fColor, font, size, speed){
+    constructor(el, chars, alpha, colors, font, size, timeout){
 		this.el = el;
 		this.chars = chars;
 		this.alpha = alpha;
-        this.color = color;
-		this.fColor = fColor;
-		this.speed = speed;
+        this.colors = colors["colors"];
+		this.fColor = colors["first"];
+		this.timeout = timeout;
 		this.ctx = el.getContext("2d");
 		this.font = font;
 		this.size = size;
@@ -57,9 +50,6 @@ class rain{
 
 		new ResizeObserver(()=>{this.setup();}).observe(el);
 		
-		renderRain(this);
+		this.renderRain();
     }
 }
-
-new rain(matrixEl, matrixChars, 6, "#00d17d", "#ffffff", "matrix_code_nfiregular", 20, 40);
-new rain(rainEl, rainChars, 33, "#00abd1", "#008bd1", "Arial", 20, 20);

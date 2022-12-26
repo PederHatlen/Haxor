@@ -26,20 +26,6 @@ body{
     justify-items: center;
     align-items: center;
 }
-#fullscreen{
-    position: absolute;
-    top: 15px;
-    margin-left: auto;
-    margin-right: auto;
-    background: white;
-    color: black;
-    padding: 2px 5px;
-    border: black 2px solid;
-    border-radius: 2px;
-}
-#fullscreen:hover{
-    background: #aaa;
-}
 canvas{background: black;}
 .el{
     outline: 2px solid white;
@@ -50,9 +36,10 @@ canvas{background: black;}
     outline: none;
     overflow-y: scroll;
 }
-.terminal .line{
+.terminal *{
     margin: 5px 10px;
     word-break: break-all;
+    white-space: pre-wrap;
 }
 
 #terminal1{grid-area: t1;}

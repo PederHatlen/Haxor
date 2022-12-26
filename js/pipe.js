@@ -1,69 +1,80 @@
-let pipesEl = document.getElementById("pipes");
-
-function randomColors(amount = 1){
-    let data = []
-    for(let i = 0; i < amount; i++) data.push("#"+(Math.random()*0xFFFFFF<<0).toString(16));
-    return data;
-}
-
-function renderPipes(object){
-    object.ctx.clearRect(0, 0, object.el.width, object.el.height);
-    for(let i = 0; i < object.pipes.length; i++){
-        object.pipes[i].render()
-    };
-    setTimeout(renderPipes, 40, object);
-}
-
 class pipe{
     constructor(hand, color){
         this.hand = hand;
-        this.ctx = this.hand.ctx;
         this.color = color;
-        this.length = Math.floor(Math.random()*100);
-        this.pos = [[Math.floor(Math.random()*hand.WH[0]), Math.floor(Math.random()*hand.WH[1])]];
-        this.curMove = [0, 0];
+        this.length = ~~(Math.random()*(hand.maxLen-hand.minLen)) + hand.minLen;
+        this.pos = [~~(Math.random()*hand.WH[0]), ~~(Math.random()*hand.WH[1])];
+        this.curMove = [0, 0, 0];
+        this.segments = [];
     }
     render(){
         // Current move has value index 1 = (binary: move along x or y)
         // index 2 = amount to move
-        if(this.curMove[1] == 0 || this.curMove[1] == NaN){
-            let axis = Math.round(Math.random());
-            let amount = Math.floor(((Math.random()*2)-1) * this.hand.WH[axis]);
-            this.curMove = [axis, amount];
+        if(this.curMove[2] <= 0){
+            let axis = this.curMove[0];
+            while(axis == this.curMove[0]) axis = Math.round(Math.random());
+
+            let amount = ~~(Math.random()*this.hand.WH[axis])+1;
+            let direction = (Math.random() < 0.5? 0:1);
+
+            this.curMove = [axis, direction, amount];
         }
 
         let size = this.hand.size;
-        let axis = this.curMove[0]
+        let axis = this.curMove[0];
+        let dir = this.curMove[1];
         
-        let newPos = [...this.pos[0]];
-        newPos[axis] += (this.curMove[1] > 0? -1:1);
-        if(newPos[axis] < 0) newPos[axis] = this.hand.WH[axis];
-        else if(newPos[axis] >= this.hand.WH[axis]) newPos[axis] = 0;
-        this.pos.unshift(newPos);
+        this.pos[axis] += dir? 1:-1;
 
-        if(this.pos.length > this.length) this.pos.pop()
+        // If the pipe overflowes in anny direction, overflow to 
+        this.pos[axis] %= this.hand.WH[axis];
+        if(this.pos[axis] < 0) this.pos[axis] = this.hand.WH[axis];
 
-        this.curMove[1] += this.curMove[1] > 0? -1:1;
+        // If dir == 1 (positive), then value on axis needs to be displaced by -1*size
+        let curSegment = [this.pos[0]*size, this.pos[1]*size, this.hand.pipeWidth, this.hand.pipeWidth];
+        curSegment[axis] -= dir*size
+        curSegment[2+axis] = size+this.hand.pipeWidth * dir;
 
-        this.ctx.fillStyle = this.color;
-        for(let i = 0; i < this.pos.length; i++){
-            this.ctx.fillRect(this.pos[i][0]*size, this.pos[i][1]*size, size, size);
-        }
+        this.segments.unshift(curSegment);
+        if(this.segments.length > this.length) this.segments.pop();
+
+        this.curMove[2]--
+
+        this.hand.ctx.fillStyle = this.color;
+        for(const i in this.segments) this.hand.ctx.fillRect(...this.segments[i]);
     }
 }
 
 class pipeRenderer{
+    renderPipes(that = this){
+        that.ctx.clearRect(0, 0, that.el.width, that.el.height);
+        for(const i in that.pipes) that.pipes[i].render();
+
+        // that.ctx.fillStyle = "#ffffff";
+        // for(let x = 0; x < that.WH[0]; x++){
+        //     for(let y = 0; y < that.WH[1]; y++){
+        //         that.ctx.fillRect(x*that.size, y*that.size, 1, 1);
+        //     }
+        // }
+
+        setTimeout(that.renderPipes, that.timeout, that);
+    }
     setup(){
         this.el.width = this.el.offsetWidth;
 		this.el.height = this.el.offsetHeight;
 
-        this.WH = [Math.floor(this.el.width/this.size), Math.floor(this.el.height/this.size)];
+        this.WH = [~~(this.el.width/this.size), ~~(this.el.height/this.size)];
     }
-    constructor(el, count, size, palette = randomColors(10)){
+    constructor(el, count, size, pipeWidth, maxLen=100, minLen=1, palette=["#fff", "#f00", "#0f0", "#00f"], timeout=40){
         this.el = el;
         this.size = size;
         this.palette = palette;
         this.ctx = el.getContext("2d");
+        this.maxLen = maxLen;
+        this.minLen = minLen;
+        this.timeout = timeout;
+        this.pipeWidth = pipeWidth;
+        this.offset = (this.size-this.pipeWidth)/2
 
         this.ctx.imageSmoothingEnabled = false;
 
@@ -71,14 +82,12 @@ class pipeRenderer{
 
         this.pipes = [];
         for(let i=0; i < count; i++){
-            let color = this.palette[Math.floor(Math.random()*this.palette.length)]
+            let color = this.palette[~~(Math.random()*this.palette.length)];
             let temp = new pipe(this, color);
             this.pipes.push(temp);
         }
 
         new ResizeObserver(()=>{this.setup();}).observe(el);
-        renderPipes(this);
+        this.renderPipes();
     }
 }
-
-new pipeRenderer(pipesEl, 25, 5)//, ["#FF0000", "#EE0044", "#663388"]);
