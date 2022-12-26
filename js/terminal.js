@@ -88,8 +88,21 @@ class terminal{
             return;
         }
         switch (e.key.toLowerCase()) {
-            case "enter": this.command(); break;
-            case "backspace": this.el.lastChild.innerHTML = this.el.lastChild.innerHTML.slice(0, -1); break;
+            case "enter":
+                this.index = -1;
+                this.history.unshift(this.el.lastChild.innerHTML);
+                this.command(this.el.lastChild.innerHTML.split("</span>")[1]);
+                break;
+            case "backspace": 
+                this.el.lastChild.innerHTML = this.el.lastChild.innerHTML.slice(0, -1);
+                break;
+            case "arrowup": 
+                if(this.index+1 < this.history.length) this.el.lastChild.innerHTML = this.history[++this.index];
+                break;
+            case "arrowdown": 
+                if(this.index-1 > 0) this.el.lastChild.innerHTML = this.history[--this.index];
+                else this.el.lastChild.innerHTML = this.lStart.outerHTML;
+                break;
             case "c":
                 this.interrupt = true;
                 this.newLine("Keyboard interrupt", false);
@@ -104,6 +117,8 @@ class terminal{
         this.font = font;
         this.dumpWait = dumpWait;
         this.interrupt = false;
+        this.history = [];
+        this.index = -1;
 
         this.lStart = document.createElement("span");
         this.lStart.innerHTML = `[${uName} ~]$ `;
