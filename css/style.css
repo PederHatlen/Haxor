@@ -1,11 +1,21 @@
-@import url('https://fonts.googleapis.com/css2?family=Inconsolata&family=M+PLUS+Rounded+1c&display=swap');
-        
+/* I do not know where this font came from, but https://transfonter.org/ was used to make it web compatible */
 @font-face {
     font-family: 'matrix_code_nfiregular';
-    src: url('../font/matrix_code_nfi-webfont.woff2') format('woff2'),
-        url('../font/matrix_code_nfi-webfont.woff') format('woff');
+    src: url('../font/matrix_code_nfi/matrix_code_nfi-webfont.woff2') format('woff2'),
+        url('../font/matrix_code_nfi/matrix_code_nfi-webfont.woff') format('woff');
     font-weight: normal;
     font-style: normal;
+}
+        
+/* Font retrieved from Google fonts (https://fonts.google.com/specimen/Inconsolata) */
+/* Made into web font with https://transfonter.org/ */
+@font-face {
+    font-family: 'Inconsolata';
+    src: url('../font/inconsolata/Inconsolata-Regular.woff2') format('woff2'),
+        url('../font/inconsolata/Inconsolata-Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
 }
 
 html{height: 100%;}
