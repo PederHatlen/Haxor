@@ -6,7 +6,7 @@
     font-weight: normal;
     font-style: normal;
 }
-        
+
 /* Font retrieved from Google fonts (https://fonts.google.com/specimen/Inconsolata) */
 /* Made into web font with https://transfonter.org/ */
 @font-face {
@@ -39,14 +39,16 @@ body{
 canvas{background: black;}
 .el{
     outline: 2px solid white;
-    width: 100%;
-    height: 100%;
+    width: calc(100% - 2px);
+    height: calc(100% - 2px);
 }
 .terminal{
     outline: none;
     overflow-y: scroll;
-    padding: 5px 10px;
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
 }
+.terminal::-webkit-scrollbar {display: none;}
 .terminal p, .terminal pre{
     margin: 5px 10px;
     word-break: break-all;

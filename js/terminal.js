@@ -33,7 +33,7 @@ class terminal{
                 this.el.textContent = '';
                 break;
             case "codedump": 
-                this.dumpText(dataDump.split("\n"), this.dumpWait, command.includes("--cont"));
+                this.dumpText(codeDump.split("\n"), this.dumpWait, command.includes("--cont"));
                 break;
             case "fullscreen":
                 document.body.requestFullscreen();
@@ -75,6 +75,7 @@ class terminal{
                     "All dumping commands can be stopped with ctrl+c"
                 ]);
                 break;
+            case "": break;
             default:
                 this.newLine(`-bash: ${command[0]}: command not found, help for commandlist`, false);
         }
