@@ -40,15 +40,21 @@ class terminal{
                 this.newLine("Press esc to quit fullscreen", false);
                 break;
             case "recolor":
-                let out = "";
-                if(command[1] != undefined && Object.keys(colorInstances).includes(command[1])){
-                    if(command[2] != undefined && !isNaN(command[2])){
-                        colorInstances[command[1]].recolor(randomColors(Number(command[2])))
-                    }else{this.newLine(`Did not find a way to use '${command[2]}' as a number`, false);}
-                }else{
+                if(command[1] == undefined || !Object.keys(colorInstances).includes(command[1])){
                     this.newLine(`Did not find '${command[1]}', available objects are: `, false);
                     this.dumpText(Object.keys(colorInstances));
                 }
+                else if(command[2] == undefined || isNaN(command[2])){
+                    this.newLine(`Did not find a way to use '${command[2]}' as a number`, false);
+                }else if(command[2] > 100){
+                    this.newLine(`No values over 100 is allowed, '${command[2]}' is too large`, false);
+                }else{
+                    let colors = randomColors(Number(command[2]))
+                    colorInstances[command[1]].reColor(colors);
+                    this.newLine(`Success! new colors are:`, false);
+                    this.dumpText(colors);
+                }
+                break;
                 break;
             case "help":
                 this.dumpText([

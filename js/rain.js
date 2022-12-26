@@ -35,7 +35,7 @@ class rain{
 
 		this.ctx.font = this.size+"px "+ this.font;
 	}
-	recolor(colors){this.colors = colors;}
+	reColor(colors){this.colors = colors;}
     constructor(el, chars, alpha, colors, font, size, timeout){
 		this.el = el;
 		this.chars = chars;
