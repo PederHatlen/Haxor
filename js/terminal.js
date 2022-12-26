@@ -12,7 +12,7 @@ class terminal{
 
         return true;
     }
-    async dumpText(lines, cont = false){
+    async dumpText(lines, dumpWait = this.dumpWait, cont = false){
         this.dumping = true;
         let i = 0;
         while(true){
@@ -20,7 +20,7 @@ class terminal{
             if(this.interrupt || (!cont && i == lines.length-1)) break;
             i = (i+1)%lines.length;
 
-            await new Promise(resolve => setTimeout(resolve, this.dumpWait));
+            await new Promise(resolve => setTimeout(resolve, dumpWait));
         }
         this.interrupt = false;
         this.dumping = false;
@@ -33,7 +33,7 @@ class terminal{
                 this.el.textContent = '';
                 break;
             case "codedump": 
-                this.dumpText(dataDump.split("\n"), command.includes("--cont"));
+                this.dumpText(dataDump.split("\n"), this.dumpWait, command.includes("--cont"));
                 break;
             case "fullscreen":
                 document.body.requestFullscreen();
@@ -55,6 +55,9 @@ class terminal{
                     this.dumpText(colors);
                 }
                 break;
+            case "tree":
+                this.dumpText(treeDump.split("\n"), 10, command.includes("--cont"));
+                break;
                 break;
             case "help":
                 this.dumpText([
@@ -62,7 +65,7 @@ class terminal{
                     "  help       - You are currently looking at it",
                     "  clear      - Clears the terminal",
                     "  codedump   - Dump some code into the terminal, can be made continuous with --cont",
-                    "  fullscreen - Putt the page in fullscreen",
+                    "  tree       - You know what this is, --cont to make continuous",
                     "  recolor    - Re color an instance: recolor [object] [color amount] (randomly selected)"
                 ]);
                 break;
