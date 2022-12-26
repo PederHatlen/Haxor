@@ -16,8 +16,8 @@ class terminal{
         this.dumping = true;
         let i = 0;
         while(true){
-            this.newLine("<pre>"+lines[i]+"</pre>", false, this.colors["dump"]);
             if(this.interrupt || (!cont && i == lines.length-1)) break;
+            this.newLine("<pre>"+lines[i]+"</pre>", false, this.colors["dump"]);
             i = (i+1)%lines.length;
 
             await new Promise(resolve => setTimeout(resolve, dumpWait));
@@ -58,32 +58,42 @@ class terminal{
             case "tree":
                 this.dumpText(treeDump.split("\n"), 10, command.includes("--cont"));
                 break;
+            case "echo":
+                this.newLine(command.slice(1).join(" "), false);
                 break;
             case "help":
                 this.dumpText([
                     "Current supported commands:",
                     "  help       - You are currently looking at it",
                     "  clear      - Clears the terminal",
+                    "  echo       - output to terminal",
                     "  codedump   - Dump some code into the terminal, can be made continuous with --cont",
                     "  tree       - You know what this is, --cont to make continuous",
-                    "  recolor    - Re color an instance: recolor [object] [color amount] (randomly selected)"
+                    "  fullscreen - Put the page in fullscreen",
+                    "  recolor    - New random colors for instance: recolor [object] [color amount]",
+                    " ",
+                    "All dumping commands can be stopped with ctrl+c"
                 ]);
                 break;
             default:
-                this.newLine();
-                this.el.lastChild.innerHTML = `-bash: ${command.split(" ")[0]}: command not found`;
+                this.newLine(`-bash: ${command[0]}: command not found, help for commandlist`, false);
         }
         if(!this.dumping) this.newLine();
     }
     keyHandler(e){
+        console.log(e.key)
         const keys = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890,._@*!?=+- ".split("");
-        if(keys.includes(e.key)){
+        if(keys.includes(e.key) && !e.ctrlKey){
             this.el.lastChild.innerHTML += e.key;
             return;
         }
-        switch (e.key) {
-            case "Enter": this.command(); break;
-            case "Backspace": this.el.lastChild.innerHTML = this.el.lastChild.innerHTML.slice(0, -1); break;
+        switch (e.key.toLowerCase()) {
+            case "enter": this.command(); break;
+            case "backspace": this.el.lastChild.innerHTML = this.el.lastChild.innerHTML.slice(0, -1); break;
+            case "c":
+                this.interrupt = true;
+                this.newLine("Keyboard interrupt", false);
+                break;
             default: break;
         }
     }
